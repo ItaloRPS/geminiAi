@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Processo {
+  id           Int      @id @default(autoincrement())
+  numero       String   @db.VarChar(255)
+  reclamada    String   @db.VarChar(255)
+  status       String   @default("em_andamento")
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  ReclamanteId Int
+  Reclamante   User     @relation(fields: [ReclamanteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model User {
+  id       Int        @id @default(autoincrement())
+  name     String?    @db.VarChar(255)
+  email    String     @unique @db.VarChar(255)
+  Processo Processo[]
+  Login Login?      
+}
+
+model Login {
+  id        Int      @id @default(autoincrement())
+  password  String   @db.VarChar(255)
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
